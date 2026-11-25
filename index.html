@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Hanoi with Reachy</title><link rel="stylesheet" href="study.css"><script src="config.js?v=4-rings-5-rings" defer></script><script src="study.js?v=rating-colors" defer></script></head>
+<body>
+<header><a href="./">Reachy <span>Research</span></a><span id="participant"></span></header>
+<main>
+ <ol id="progress"><li>Before</li><li>On your own</li><li>With Reachy</li><li>After</li></ol>
+ <section id="before">
+  <div class="intro"><div><h1>Tower of Hanoi</h1><p>Solve a four-ring puzzle on your own, then a five-ring puzzle with Reachy. Both rounds use three pegs. You have five minutes for each round.</p><p>Move one top disk at a time. A larger disk cannot go on a smaller one. Select two pegs or drag a disk to another peg.</p></div><img src="media/reachy.jpg" alt="Reachy Mini"></div>
+  <form id="baseline"><h2>Before you begin</h2><div id="preRatings"></div>
+  <label class="consent"><input type="checkbox" required> I agree to take part and have my ratings, moves, and use of hints recorded under my participant code. I can stop at any time.</label>
+  <p id="privacy"></p><button class="primary">Continue to round 1</button></form>
+ </section>
+ <section id="puzzle" hidden>
+  <div class="task-head"><div><h1 id="taskTitle">Move the tower to Peg 3</h1><p id="moveNote" role="status">Explore the controls before starting.</p></div><strong id="timer" role="timer" aria-label="Time remaining">5:00</strong></div>
+  <div class="play-layout"><div class="board-panel"><div id="board" aria-label="Hanoi puzzle board"></div>
+   <div class="board-footer"><span id="moves">0 moves</span><button id="start" class="primary">Start five-minute task</button><button id="stop" hidden>End task</button></div>
+  </div>
+  <aside id="coachPanel" hidden><video id="robot" autoplay muted playsinline loop poster="media/reachy.jpg" src="media/idle.webm" aria-label="Prerecorded Reachy reaction"></video>
+   <div class="coach"><h2>Reachy</h2><p id="reply" aria-live="polite">I can offer a hint when you’re ready.</p>
+   <button id="hint" class="primary" disabled>Ask for a hint</button><div id="offer" hidden><button id="accept">Hear the hint</button><button id="dismiss">Keep going</button></div>
+   <form id="ask"><label for="question">Ask a puzzle question</label><div><input id="question" maxlength="220" placeholder="Why can’t I move that disk?" disabled><button id="send" disabled>Ask</button></div></form>
+   <label class="consent"><input id="sound" type="checkbox" checked> Play spoken replies</label></div>
+  </aside></div>
+ </section>
+ <section id="between" hidden><h1>Round 1 complete</h1><p id="soloOutcome"></p><form id="checkpoint"><div id="midRatings"></div><button class="primary">Continue to round 2</button></form></section>
+ <section id="after" hidden><h1>How did it feel?</h1><p id="outcome"></p><video id="closing" muted playsinline poster="media/reachy.jpg" aria-label="Reachy closing reaction"></video>
+  <form id="followup"><div id="postRatings"></div><button class="primary">Save and finish</button></form>
+  <p id="saveStatus" role="status"></p><button id="download" hidden>Download session record</button>
+ </section>
+</main><footer>Hanoi research study · Reachy Mini playback</footer>
+</body></html>
