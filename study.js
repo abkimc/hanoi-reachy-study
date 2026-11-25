@@ -358,6 +358,13 @@ function playCoachVoice(lines, text, id) {
   }
   advance();
 }
+const friendlyStarters = [
+  { clip: "try-this", text: "Try this." },
+  { clip: "next-up", text: "Next up." },
+  { clip: "youve-got-this", text: "You’ve got this." },
+  null
+];
+let friendlyHintCount = 0;
 function help(question, input) {
   if (!assisted || phase !== "running") return;
   if (Date.now() >= deadline) return end("time_limit");
@@ -373,15 +380,12 @@ function help(question, input) {
   const instruction = "Pick up the " + ["orange", "coral", "teal", "purple", "yellow"][hint.disk]
     + " ring from peg " + (hint.from + 1) + ". Place it on peg " + (hint.to + 1) + ".";
   const friendly = run.condition === "friendly";
-  const simple = (friendly ? "Let’s take it one move at a time. " : "") + instruction;
-  $("reply").textContent = simple;
   clip(friendly ? "hint" : "thinking");
   log("hint_shown", { request: id, from: hint.from + 1, to: hint.to + 1, latencyMs: Math.round(performance.now() - then) });
-  const rule = question ? explainRule(question) : null;
-  const spoken = rule ? rule.text + " " + simple : simple;
-  const lines = [];
-  if (rule) lines.push(rule.clip);
-  if (friendly) lines.push("friendly");
+  const intro = question ? explainRule(question)
+    : friendly ? friendlyStarters[friendlyHintCount++ % friendlyStarters.length] : null;
+  const spoken = intro ? intro.text + " " + instruction : instruction;
+  const lines = intro ? [intro.clip] : [];
   lines.push("move-" + hint.disk + "-" + (hint.from + 1) + "-" + (hint.to + 1));
   $("reply").textContent = spoken;
   if ($("sound").checked) playCoachVoice(lines, spoken, id);

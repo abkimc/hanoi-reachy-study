@@ -28,7 +28,9 @@ def record(name, text):
         stream.writeframes((np.clip(samples, -1, 1) * 32767).astype("<i2").tobytes())
 
 for name, text in {
-    "friendly": "Let's take it one move at a time.",
+    "try-this": "Try this.",
+    "next-up": "Next up.",
+    "youve-got-this": "You’ve got this.",
     "size": "Larger rings must stay below smaller rings.",
     "goal": "Stack every ring on peg three to finish.",
     "top": "Only the top ring of each peg can move.",
