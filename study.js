@@ -80,6 +80,7 @@ let board = Array(diskCount).fill(0), selected = null, drag = null;
 let phase = "orientation", started, deadline, t, count = 0, replyId = 0;
 let advice, lastMove, lastOffer = 0, offerReason, struggle = 0;
 let clipTimer;
+const voicePlayer = $("coachVoice");
 const colors = ["#ffc487", "#ef927d", "#7dd4c4", "#a9a4e8", "#e6d486"];
 const time = () => started === undefined ? null : Math.round(performance.now() - started);
 function log(type, details = {}) { run.events.push({ type, ms: time(), ...details }); }
@@ -223,7 +224,7 @@ window.addEventListener("pointercancel", release);
 function clip(name, hold = false) {
   clearTimeout(clipTimer);
   const robot = $("robot");
-  robot.src = "media/" + name + ".webm";
+  robot.src = "media/" + name + ".webm?v=expressive-v2";
   robot.play().catch(() => {});
   if (name !== "idle" && !hold) clipTimer = setTimeout(() => clip("idle"), 2900);
 }
@@ -311,6 +312,8 @@ function end(outcome) {
 $("stop").onclick = () => end("stopped");
 function silence() {
   replyId++;
+  voicePlayer.pause();
+  voicePlayer.onended = voicePlayer.onerror = null;
   window.speechSynthesis?.cancel();
 }
 function speakingClip(id) {
@@ -334,6 +337,27 @@ $("sound").onchange = () => {
     clip("idle");
   }
 };
+function playCoachVoice(lines, text, id) {
+  let next = 0;
+  let fallbackStarted = false;
+  function fallback() {
+    if (id !== replyId || fallbackStarted) return;
+    fallbackStarted = true;
+    voicePlayer.onended = voicePlayer.onerror = null;
+    deviceSpeech(text, id);
+  }
+  function advance() {
+    if (id !== replyId || phase !== "running" || fallbackStarted) return;
+    if (next === lines.length) return finishSpeech(id);
+    voicePlayer.src = "media/voice/" + lines[next++] + ".wav";
+    voicePlayer.onended = advance;
+    voicePlayer.onerror = fallback;
+    voicePlayer.play().then(() => {
+      if (next === 1) speakingClip(id);
+    }).catch(fallback);
+  }
+  advance();
+}
 function help(question, input) {
   if (!assisted || phase !== "running") return;
   if (Date.now() >= deadline) return end("time_limit");
@@ -347,20 +371,25 @@ function help(question, input) {
   if (advice) log("hint_superseded", { request: advice.request });
   advice = { ...hint, request: id };
   const instruction = "Pick up the " + ["orange", "coral", "teal", "purple", "yellow"][hint.disk]
-    + " disk from peg " + (hint.from + 1) + ". Place it on peg " + (hint.to + 1) + ".";
+    + " ring from peg " + (hint.from + 1) + ". Place it on peg " + (hint.to + 1) + ".";
   const friendly = run.condition === "friendly";
   const simple = (friendly ? "Let’s take it one move at a time. " : "") + instruction;
   $("reply").textContent = simple;
   clip(friendly ? "hint" : "thinking");
   log("hint_shown", { request: id, from: hint.from + 1, to: hint.to + 1, latencyMs: Math.round(performance.now() - then) });
-  const spoken = question ? explainRule(question) + " " + simple : simple;
+  const rule = question ? explainRule(question) : null;
+  const spoken = rule ? rule.text + " " + simple : simple;
+  const lines = [];
+  if (rule) lines.push(rule.clip);
+  if (friendly) lines.push("friendly");
+  lines.push("move-" + hint.disk + "-" + (hint.from + 1) + "-" + (hint.to + 1));
   $("reply").textContent = spoken;
-  if ($("sound").checked) deviceSpeech(spoken, id);
+  if ($("sound").checked) playCoachVoice(lines, spoken, id);
 }
 function explainRule(question) {
-  if (/larger|smaller|size|big/i.test(question)) return "Larger disks must stay below smaller disks.";
-  if (/goal|finish|win/i.test(question)) return "Stack every disk on peg " + pegCount + " to finish.";
-  return "Only the top disk of each peg can move.";
+  if (/larger|smaller|size|big/i.test(question)) return { clip: "size", text: "Larger rings must stay below smaller rings." };
+  if (/goal|finish|win/i.test(question)) return { clip: "goal", text: "Stack every ring on peg 3 to finish." };
+  return { clip: "top", text: "Only the top ring of each peg can move." };
 }
 $("hint").onclick = () => help("", "button");
 $("ask").onsubmit = event => {

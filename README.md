@@ -1,6 +1,6 @@
 # Hanoi with Reachy
 
-A self-guided study for phones and desktops. Serve the repository root over HTTPS or localhost. Each round uses three pegs and a five-minute timer. Participants solve a four-ring puzzle alone, report their stress, then solve a five-ring puzzle with Reachy. They can drag disks, tap two pegs, or use the keyboard. The goal is the last peg in each round. Participants can see the board before starting. Disk movement unlocks when the timer starts.
+A self-guided study for phones and desktops. Serve the repository root over HTTPS or localhost. Each round uses three pegs and a five-minute timer. Participants solve a three-ring puzzle alone, report their stress, then solve a five-ring puzzle with Reachy. They can drag disks, tap two pegs, or use the keyboard. The goal is the last peg in each round. Participants can see the board before starting. Disk movement unlocks when the timer starts.
 
 ## Participant links
 
@@ -23,7 +23,7 @@ The Apps Script endpoint accepts public submissions. Its origin check limits whe
 
 ## Reachy and speech
 
-The self-guided build uses the puzzle solver, built-in explanations, device speech, and prerecorded video. Participants need no account, API key, or facilitator. The settings are fixed in `config.js`. API-generated text and speech would require a hosted service with a protected key before they can run unattended.
+The self-guided build uses the puzzle solver, built-in explanations, bundled Kokoro voice clips, and prerecorded video. Browser speech serves as an audio fallback. Participants need no account, API key, or facilitator. The settings are fixed in `config.js`. API-generated text and speech would require a hosted service with a protected key before they can run unattended.
 
 For a future model comparison, use identical puzzle questions and states for Nemotron 3.5 Lightning and Nemotron 3 Ultra. For speech, compare Fish Audio S2.1 Pro Free, device speech, and Kokoro 82M on latency, peg-number pronunciation, pauses, and cutoff. No provider comparison has been run.
 

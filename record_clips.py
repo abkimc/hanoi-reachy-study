@@ -15,9 +15,9 @@ model.geom_conaffinity[:] = 0
 print([model.actuator(i).name for i in range(model.nu)], flush=True)
 renderer = mujoco.Renderer(model, height=360, width=480)
 for name, speed, depth, side in [
-    ("idle", 1, .017, .013), ("thinking", 1, .040, .060),
-    ("hint", 2, .095, .035), ("retry", 1, .030, .075),
-    ("success", 3, .120, .085), ("finish", 1, .060, .015),
+    ("idle", 1, .017, .013), ("thinking", 1, .075, .24),
+    ("hint", 2, .18, .19), ("retry", 2, .065, .32),
+    ("success", 3, .23, .30), ("finish", 1, .15, .16),
 ]:
     target = root / "media" / (name + ".webm")
     writer = cv2.VideoWriter(str(target), cv2.VideoWriter_fourcc(*"VP80"), 24, (480, 360))
@@ -31,11 +31,12 @@ for name, speed, depth, side in [
         for i in range(model.nu):
             actuator = model.actuator(i).name.lower()
             if "antenna" in actuator:
-                data.ctrl[i] = side * wave * (1 if "left" in actuator else -1)
+                data.ctrl[i] = 1.65 * side * math.sin(2 * math.pi * speed * t + (.8 if "left" in actuator else -.8)) * envelope
             elif "yaw" in actuator:
                 data.ctrl[i] = side * wave
             else:
-                data.ctrl[i] = depth * wave * math.cos(i * math.pi / 3)
+                leg = int(actuator.rsplit("_", 1)[1]) - 1
+                data.ctrl[i] = depth * wave * math.cos(leg * math.pi / 3)
         for _ in range(max(1, round(1 / 24 / model.opt.timestep))):
             mujoco.mj_step(model, data)
         renderer.update_scene(data, camera="lab_overview")

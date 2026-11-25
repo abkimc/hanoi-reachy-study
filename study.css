@@ -14,3 +14,11 @@
 #board{grid-template-columns:repeat(var(--pegs,3),minmax(0,1fr))}.solo .play-layout{grid-template-columns:minmax(0,1fr)}#between{background:#fff;border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,28px)}@media(max-width:450px){.peg{font-size:.83rem}}
 
 .peg:disabled{opacity:1;cursor:default}.peg:disabled:hover{border-color:transparent}.peg:disabled .disk{cursor:default}
+#coachPanel{display:block}
+.robot-stage{position:relative;isolation:isolate;height:clamp(205px,22vw,240px);overflow:hidden;background:#314662}
+.robot-stage #robot{display:block;width:72%;height:100%;max-height:none;object-fit:cover;object-position:center}
+.speech-bubble{position:absolute;z-index:1;right:7px;top:50%;transform:translateY(-50%);width:49%;margin:0;padding:clamp(6px,1.6vw,12px);border:2px solid #17322c;border-radius:14px;background:#fffdf2;color:#152d26;font-size:clamp(.75rem,1.8vw,.96rem);line-height:1.31;font-weight:700;box-shadow:2px 3px #17322c;pointer-events:none}
+.speech-bubble::before,.speech-bubble::after{content:"";position:absolute;top:29%;width:25px;height:22px;clip-path:polygon(100% 0,100% 100%,0 8%)}
+.speech-bubble::before{right:100%;background:#17322c}
+.speech-bubble::after{right:calc(100% - 4px);top:calc(29% + 2px);background:#fffdf2}
+@media(max-width:720px){.robot-stage{height:165px}.robot-stage #robot{width:72%;height:100%;object-fit:cover;object-position:center 48%}.speech-bubble{width:53%;max-width:290px}}
