@@ -1,11 +1,16 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Hanoi with Reachy</title><link rel="stylesheet" href="study.css?v=comic-voice"><script src="config.js?v=comic-voice" defer></script><script src="study.js?v=short-hints" defer></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Hanoi with Reachy</title><link rel="stylesheet" href="study.css?v=reachy-rules"><script src="config.js?v=comic-voice" defer></script><script src="study.js?v=reachy-rules" defer></script></head>
 <body>
 <header><a href="./">Reachy <span>Research</span></a><span id="participant"></span></header>
 <main>
  <ol id="progress"><li>Before</li><li>On your own</li><li>With Reachy</li><li>After</li></ol>
  <section id="before">
-  <div class="intro"><div><h1>Tower of Hanoi</h1><p>Solve a three-ring puzzle on your own, then a five-ring puzzle with Reachy. Both rounds use three pegs. You have five minutes for each round.</p><p>Move one top disk at a time. A larger disk cannot go on a smaller one. Select two pegs or drag a disk to another peg.</p></div><img src="media/reachy.jpg" alt="Reachy Mini"></div>
+  <div class="intro"><div><h1>Tower of Hanoi</h1><p>Solve a three-ring puzzle on your own, then a five-ring puzzle with Reachy. Both rounds use three pegs. You have five minutes for each round.</p><p>Select two pegs or drag a ring to another peg.</p></div><img src="media/reachy.jpg" alt="Reachy Mini"></div>
+  <details class="rules" open><summary>Puzzle rules</summary>
+   <p><strong>Goal:</strong> Move the entire tower from Peg 1 to Peg 3.</p>
+   <ol><li>Move one ring at a time, taking only the top ring from a peg.</li><li>Never place a larger ring on a smaller one.</li></ol>
+   <p>With three pegs, each extra ring doubles the minimum number of moves and adds one. Three rings take 7 moves, four take 15, and five take 31.</p>
+  </details>
   <form id="baseline"><h2>Before you begin</h2><div id="preRatings"></div>
   <label class="consent"><input type="checkbox" required> I agree to take part and have my ratings, moves, and use of hints recorded under my participant code. I can stop at any time.</label>
   <p id="privacy"></p><button class="primary">Continue to round 1</button></form>
@@ -18,6 +23,7 @@
   <aside id="coachPanel" hidden><div class="robot-stage"><video id="robot" autoplay muted playsinline loop poster="media/reachy.jpg" src="media/idle.webm" aria-label="Prerecorded Reachy reaction"></video>
    <audio id="coachVoice" preload="none"></audio><p id="reply" class="speech-bubble" aria-live="polite">I can offer a hint when you’re ready.</p></div>
    <div class="coach">
+   <button id="hearRules" type="button">Hear the rules</button>
    <button id="hint" class="primary" disabled>Ask for a hint</button><div id="offer" hidden><button id="accept">Hear the hint</button><button id="dismiss">Keep going</button></div>
    <form id="ask"><label for="question">Ask a puzzle question</label><div><input id="question" maxlength="220" placeholder="Why can’t I move that disk?" disabled><button id="send" disabled>Ask</button></div></form>
    <label class="consent"><input id="sound" type="checkbox" checked> Play spoken replies</label></div>

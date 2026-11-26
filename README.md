@@ -36,3 +36,7 @@ For a future model comparison, use identical puzzle questions and states for Nem
 ## Media
 
 The WebM library was recorded from the existing Reachy Mini simulation. `record_clips.py` is an optional regeneration tool that uses the sibling Reachy Studio source and its simulator dependencies. It is unnecessary for hosting or playing the study. 
+
+## Reachy condition design
+
+Both groups get the same written rules, the same spoken rules before the assisted timer, and the same solver, hint triggers, and time limit. The friendly Reachy uses short encouragement, collaborative offers, and larger head and antenna motion. The direct Reachy gives the move without an opener, uses transactional wording, and makes a smaller gesture. This compares two interaction styles as a package. The warmth and competence ratings can help check whether participants perceive the intended distinction.

@@ -75,6 +75,9 @@ function screen(id) {
 screen("before");
 
 const pegCount = config.pegs;
+const roundRules = document.querySelector("#before .rules").cloneNode(true);
+roundRules.open = false;
+document.querySelector(".board-panel").append(roundRules);
 let assisted = false, diskCount = config.soloDisks;
 let board = Array(diskCount).fill(0), selected = null, drag = null;
 let phase = "orientation", started, deadline, t, count = 0, replyId = 0;
@@ -234,8 +237,8 @@ function offerHelp(reason) {
   offerReason = reason;
   log("help_offered", { reason });
   $("offer").hidden = false;
-  $("reply").textContent = run.condition === "friendly" ? "Want to try a hint together?" : "A next-move hint is available.";
-  clip("thinking");
+  $("reply").textContent = coachStyle().offer;
+  clip(coachStyle().offerClip);
 }
 function tick() {
   const seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
@@ -245,6 +248,12 @@ function tick() {
   else if (Date.now() - lastMove >= 25000) offerHelp("inactivity");
 }
 $("start").onclick = () => {
+  if (assisted) {
+    silence();
+    clip("idle");
+    $("hearRules").hidden = true;
+    $("reply").textContent = coachStyle().ready.text;
+  }
   board = Array(diskCount).fill(0);
   selected = null;
   phase = "running";
@@ -279,8 +288,11 @@ function prepareRound(withReachy) {
   $("start").hidden = false;
   $("stop").hidden = true;
   screen("puzzle");
-  if (assisted) clip("idle");
   draw();
+  if (assisted) {
+    $("hearRules").hidden = false;
+    briefRules();
+  }
 }
 function end(outcome) {
   if (phase !== "running") return;
@@ -316,11 +328,24 @@ function silence() {
   voicePlayer.onended = voicePlayer.onerror = null;
   window.speechSynthesis?.cancel();
 }
+const coachStyles = {
+  friendly: {
+    speechClip: "hint", offerClip: "thinking", offer: "Want a hint? We can work it out.",
+    ready: { clip: "warm-ready", text: "Ready when you are. Ask me if you get stuck." },
+    dismiss: "Of course. I’m here if you need me."
+  },
+  direct: {
+    speechClip: "direct", offerClip: "direct", offer: "A next-move hint is available.",
+    ready: { clip: "direct-ready", text: "Start when ready. Hints are available." },
+    dismiss: "Hint dismissed."
+  }
+};
+const coachStyle = () => coachStyles[run.condition];
 function speakingClip(id) {
-  if (id === replyId && phase === "running") clip(run.condition === "friendly" ? "hint" : "thinking", true);
+  if (id === replyId && phase !== "done") clip(coachStyle().speechClip, true);
 }
 function finishSpeech(id) {
-  if (id === replyId && phase === "running") clip("idle");
+  if (id === replyId && phase !== "done") clip("idle");
 }
 function deviceSpeech(text, id) {
   if (!window.speechSynthesis) return;
@@ -337,7 +362,7 @@ $("sound").onchange = () => {
     clip("idle");
   }
 };
-function playCoachVoice(lines, text, id) {
+function playCoachVoice(lines, text, id, showLine) {
   let next = 0;
   let fallbackStarted = false;
   function fallback() {
@@ -347,8 +372,9 @@ function playCoachVoice(lines, text, id) {
     deviceSpeech(text, id);
   }
   function advance() {
-    if (id !== replyId || phase !== "running" || fallbackStarted) return;
+    if (id !== replyId || phase === "done" || fallbackStarted) return;
     if (next === lines.length) return finishSpeech(id);
+    showLine?.(next);
     voicePlayer.src = "media/voice/" + lines[next++] + ".wav";
     voicePlayer.onended = advance;
     voicePlayer.onerror = fallback;
@@ -358,6 +384,22 @@ function playCoachVoice(lines, text, id) {
   }
   advance();
 }
+const ruleBriefing = [
+  { clip: "rules-goal", text: "Move the whole tower from Peg 1 to Peg 3." },
+  { clip: "rules-two", text: "Move only one top ring at a time. Never place a larger ring on a smaller one." },
+  { clip: "rules-moves", text: "Each extra ring doubles the minimum moves and adds one. 3 rings: 7 moves. 4: 15. 5: 31." }
+];
+function briefRules() {
+  silence();
+  const lines = [...ruleBriefing, coachStyle().ready];
+  const showLine = index => { $("reply").textContent = lines[index].text; };
+  showLine(0);
+  clip(coachStyle().speechClip);
+  if ($("sound").checked) playCoachVoice(lines.map(line => line.clip), lines.map(line => line.text).join(" "), replyId, showLine);
+}
+$("hearRules").onclick = () => {
+  if (assisted && phase === "orientation") briefRules();
+};
 const friendlyStarters = [
   { clip: "try-this", text: "Try this." },
   { clip: "next-up", text: "Next up." },
@@ -380,7 +422,7 @@ function help(question, input) {
   const instruction = "Pick up the " + ["orange", "coral", "teal", "purple", "yellow"][hint.disk]
     + " ring from peg " + (hint.from + 1) + ". Place it on peg " + (hint.to + 1) + ".";
   const friendly = run.condition === "friendly";
-  clip(friendly ? "hint" : "thinking");
+  clip(coachStyle().speechClip);
   log("hint_shown", { request: id, from: hint.from + 1, to: hint.to + 1, latencyMs: Math.round(performance.now() - then) });
   const intro = question ? explainRule(question)
     : friendly ? friendlyStarters[friendlyHintCount++ % friendlyStarters.length] : null;
@@ -407,7 +449,7 @@ $("accept").onclick = () => help("", "offer");
 $("dismiss").onclick = () => {
   $("offer").hidden = true;
   log("offer_dismissed", { reason: offerReason });
-  $("reply").textContent = "You can ask for a hint at any time.";
+  $("reply").textContent = coachStyle().dismiss;
 };
 
 function submitToForms(record) {

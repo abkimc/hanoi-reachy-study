@@ -16,9 +16,11 @@ print([model.actuator(i).name for i in range(model.nu)], flush=True)
 renderer = mujoco.Renderer(model, height=360, width=480)
 for name, speed, depth, side in [
     ("idle", 1, .017, .013), ("thinking", 1, .075, .24),
-    ("hint", 2, .18, .19), ("retry", 2, .065, .32),
+    ("hint", 2, .18, .19), ("direct", 1, .085, .045), ("retry", 2, .065, .32),
     ("success", 3, .23, .30), ("finish", 1, .15, .16),
 ]:
+    if sys.argv[1:] and name not in sys.argv[1:]:
+        continue
     target = root / "media" / (name + ".webm")
     writer = cv2.VideoWriter(str(target), cv2.VideoWriter_fourcc(*"VP80"), 24, (480, 360))
     if not writer.isOpened():

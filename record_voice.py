@@ -27,20 +27,28 @@ def record(name, text):
         stream.setparams((1, 2, rate, 0, "NONE", "not compressed"))
         stream.writeframes((np.clip(samples, -1, 1) * 32767).astype("<i2").tobytes())
 
-for name, text in {
+VOICE_LINES = {
     "try-this": "Try this.",
     "next-up": "Next up.",
     "youve-got-this": "You’ve got this.",
     "size": "Larger rings must stay below smaller rings.",
     "goal": "Stack every ring on peg three to finish.",
     "top": "Only the top ring of each peg can move.",
-}.items():
-    record(name, text)
+    "rules-goal": "Your goal is to move the whole tower from peg one to peg three.",
+    "rules-two": "Move one ring at a time, and always take the top ring. Never put a larger ring on a smaller one.",
+    "rules-moves": "Each extra ring doubles the minimum number of moves, then adds one. Three rings take seven moves. Four take fifteen. Five take thirty-one.",
+    "warm-ready": "Ready when you are. Ask me if you get stuck.",
+    "direct-ready": "Start when ready. Hints are available.",
+}
 
-for disk, color in enumerate(("orange", "coral", "teal", "purple", "yellow")):
-    for source in range(1, 4):
-        for target in range(1, 4):
-            if source != target:
-                record(f"move-{disk}-{source}-{target}",
-                       f"Pick up the {color} ring from peg {source}. Place it on peg {target}.")
-print(f"Recorded {len(list(output.glob('*.wav')))} Kokoro voice lines.")
+if __name__ == "__main__":
+    requested = sys.argv[1:]
+    for name in requested or VOICE_LINES:
+        record(name, VOICE_LINES[name])
+    if not requested:
+        for disk, color in enumerate(("orange", "coral", "teal", "purple", "yellow")):
+            for source in range(1, 4):
+                for target in range(1, 4):
+                    if source != target:
+                        record(f"move-{disk}-{source}-{target}",
+                               f"Pick up the {color} ring from peg {source}. Place it on peg {target}.")
